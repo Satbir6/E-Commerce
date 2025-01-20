@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QuickCart</title>
+    <link
+      rel="icon"
+      href="{{url_for('static',filename='dist/images/logo-removebg.png')}}"
+      type="image/png"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static',filename='dist/css/output.css')}}"
+    />
+  </head>
+
+  <body style="overflow: hidden">
+    <section class="bg-gray-50 dark:bg-gray-900" style="padding-top: 20px">
+      <div
+        class="flex flex-col md:flex-row justify-center items-center md:items-start px-48 py-8 mx-auto md:h-screen lg:py-0"
+      >
+        <div class="w-full">
+          <a
+            href="#"
+            class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white"
+          >
+            <img
+              class="w-8 h-8 mr-2"
+              src="{{url_for('static',filename='dist/images/logo.jpg')}}"
+              alt="logo"
+            />
+            QuickCart
+          </a>
+          <!-- Form Section -->
+          <div
+            class="w-full bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700"
+          >
+            <div class="p-6 space-y-4 md:space-y-6 sm:p-5">
+              {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %} {% for category, message in messages %}
+              <div
+                class="p-4 mb-4 text-sm rounded-lg {% if category == 'error' %}text-red-800 bg-red-50{% else %}text-green-800 bg-green-50{% endif %}"
+                role="alert"
+              >
+                {{ message }}
+              </div>
+              {% endfor %} {% endif %} {% endwith %}
+              <h1
+                class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white"
+              >
+                Create an account
+              </h1>
+
+              <form method="POST">
+                <div class="grid gap-6 mb-6 md:grid-cols-2">
+                  <div>
+                    <label
+                      for="first_name"
+                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >First name</label
+                    >
+                    <input
+                      type="text"
+                      id="first_name"
+                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="John"
+                      name="first_name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="last_name"
+                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >Last name</label
+                    >
+                    <input
+                      type="text"
+                      id="last_name"
+                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="Doe"
+                      name="last_name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="email"
+                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >Email address</label
+                    >
+                    <input
+                      type="email"
+                      id="email"
+                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="john.doe@company.com"
+                      name="email"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="phone"
+                      class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >Phone number</label
+                    >
+                    <input
+                      type="tel"
+                      id="phone"
+                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="0000000000"
+                      pattern="[0-9]{10}"
+                      name="phone"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="mb-6">
+                  <label
+                    for="address"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >Address</label
+                  >
+                  <input
+                    type="text"
+                    id="address"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="123, Street, City, State, Country"
+                    name="address"
+                    required
+                  />
+                </div>
+                <div class="mb-6">
+                  <label
+                    for="password"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >Password</label
+                  >
+                  <input
+                    type="password"
+                    id="password"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="•••••••••"
+                    name="password"
+                    required
+                  />
+                </div>
+                <div class="mb-6">
+                  <label
+                    for="confirm_password"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >Confirm password</label
+                  >
+                  <input
+                    type="password"
+                    id="confirm_password"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="•••••••••"
+                    name="confirm_password"
+                    required
+                  />
+                </div>
+                <div class="flex items-start mb-6">
+                  <div class="flex items-center h-5">
+                    <input
+                      id="remember"
+                      type="checkbox"
+                      value=""
+                      class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
+                      required
+                    />
+                  </div>
+                  <label
+                    for="remember"
+                    class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                    >I agree with the
+                    <a
+                      href="#"
+                      class="text-blue-600 hover:underline dark:text-blue-500"
+                      >terms and conditions</a
+                    >.</label
+                  >
+                </div>
+                <button
+                  type="submit"
+                  class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                >
+                  Submit
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+  </body>
+</html>

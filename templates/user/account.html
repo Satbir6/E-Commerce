@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QuickCart</title>
+    <link
+      rel="icon"
+      href="{{url_for('static',filename='dist/images/logo-removebg.png')}}"
+      type="image/png"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static',filename='dist/css/output.css')}}"
+    />
+  </head>
+
+  <body>
+    <section class="bg-white py-8 antialiased dark:bg-gray-900 md:py-8">
+      <div class="mx-auto max-w-screen-lg px-4 2xl:px-0">
+        <nav class="mb-4 flex" aria-label="Breadcrumb">
+          <ol
+            class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse"
+          >
+            <li class="inline-flex items-center">
+              <a
+                href="{{url_for('home')}}"
+                class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-white"
+              >
+                <svg
+                  class="me-2 h-4 w-4"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m4 12 8-8 8 8M6 10.5V19a1 1 0 0 0 1 1h3v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h3a1 1 0 0 0 1-1v-8.5"
+                  />
+                </svg>
+                Home
+              </a>
+            </li>
+
+            <li aria-current="page">
+              <div class="flex items-center">
+                <svg
+                  class="mx-1 h-4 w-4 text-gray-400 rtl:rotate-180"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m9 5 7 7-7 7"
+                  />
+                </svg>
+                <span
+                  class="ms-1 text-sm font-medium text-gray-500 dark:text-gray-400 md:ms-2"
+                  >My Account</span
+                >
+              </div>
+            </li>
+          </ol>
+        </nav>
+        <h2
+          class="mb-4 text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl md:mb-6"
+        >
+          General overview
+        </h2>
+
+        <div class="py-4 md:py-8">
+          <div class="mb-4 grid gap-4 sm:grid-cols-2 sm:gap-8 lg:gap-16">
+            <div class="space-y-4">
+              <div class="flex space-x-4">
+                <img
+                  class="h-16 w-16 rounded-lg"
+                  src="{{url_for('static',filename='dist/images/user.png')}}"
+                  alt="Helene avatar"
+                />
+                <div>
+                  <span
+                    class="mb-2 inline-block rounded px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300"
+                  >
+                  </span>
+                  <h2
+                    class="flex items-center text-xl font-bold leading-none text-gray-900 dark:text-white sm:text-2xl"
+                  >
+                    {{user.first_name}} {{user.last_name}}
+                  </h2>
+                </div>
+              </div>
+              <dl class="">
+                <dt class="font-semibold text-gray-900 dark:text-white">
+                  Email Address
+                </dt>
+                <dd class="text-gray-500 dark:text-gray-400">{{user.email}}</dd>
+              </dl>
+              <dl>
+                <dt class="font-semibold text-gray-900 dark:text-white">
+                  Home Address
+                </dt>
+                <dd
+                  class="flex items-center gap-1 text-gray-500 dark:text-gray-400"
+                >
+                  <svg
+                    class="hidden h-5 w-5 shrink-0 text-gray-400 dark:text-gray-500 lg:inline"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="m4 12 8-8 8 8M6 10.5V19a1 1 0 0 0 1 1h3v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h3a1 1 0 0 0 1-1v-8.5"
+                    />
+                  </svg>
+                  {{user.address}}
+                </dd>
+              </dl>
+            </div>
+            <div class="space-y-4">
+              <dl>
+                <dt class="font-semibold text-gray-900 dark:text-white">
+                  Phone Number
+                </dt>
+                <dd class="text-gray-500 dark:text-gray-400">
+                  {{user.phone_number}}
+                </dd>
+              </dl>
+              <dl>
+                <dt class="font-semibold text-gray-900 dark:text-white">
+                  Your Earning
+                </dt>
+                <dd class="text-gray-500 dark:text-gray-400">
+                  {% if user.is_seller %}
+                  <span class="text-green-500">₹</span>
+                  {{user.earning}} {% else %} Become a seller to earn {% endif
+                  %}
+                </dd>
+              </dl>
+              <dl>
+                <dt class="font-semibold text-gray-900 dark:text-white">
+                  Account Created At
+                </dt>
+                <dd class="text-gray-500 dark:text-gray-400">
+                  {{user.created_at.strftime('%Y-%m-%d')}}
+                </dd>
+              </dl>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            data-modal-target="accountInformationModal2"
+            data-modal-toggle="accountInformationModal2"
+            class="inline-flex w-full items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 sm:w-auto"
+          >
+            <svg
+              class="-ms-0.5 me-1.5 h-4 w-4"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+              ></path>
+            </svg>
+            Edit your data
+          </button>
+          {% if not user.is_seller %}
+          <button
+            type="button"
+            class="inline-flex w-full items-center justify-center rounded-lg bg-primary-700 mx-1 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 sm:w-auto"
+          >
+            <svg
+              class="-ms-0.5 me-1.5 h-4 w-4"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M7 6a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-2v-4a3 3 0 0 0-3-3H7V6Z"
+                clip-rule="evenodd"
+              />
+              <path
+                fill-rule="evenodd"
+                d="M2 11a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-7Zm7.5 1a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z"
+                clip-rule="evenodd"
+              />
+              <path d="M10.5 14.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" />
+            </svg>
+
+            Become a seller
+          </button>
+          {% endif %}
+        </div>
+        <div
+          class="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800 md:p-8"
+        >
+          <h3 class="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
+            Latest orders
+          </h3>
+          {% if user.orders %} {% for order in
+          user.orders|sort(attribute='created_at', reverse=True)|slice(4) %}
+          <div
+            class="flex flex-wrap items-center gap-y-4 {% if not loop.last %}border-b border-gray-200 pb-4 dark:border-gray-700 md:pb-5{% endif %} {% if not loop.first %}pt-4 md:pt-5{% endif %}"
+          >
+            <dl class="w-1/2 sm:w-48">
+              <dt
+                class="text-base font-medium text-gray-500 dark:text-gray-400"
+              >
+                Order ID:
+              </dt>
+              <dd
+                class="mt-1.5 text-base font-semibold text-gray-900 dark:text-white"
+              >
+                <a href="#" class="hover:underline">#{{ order.id }}</a>
+              </dd>
+            </dl>
+
+            <dl class="w-1/2 sm:w-1/4 md:flex-1 lg:w-auto">
+              <dt
+                class="text-base font-medium text-gray-500 dark:text-gray-400"
+              >
+                Date:
+              </dt>
+              <dd
+                class="mt-1.5 text-base font-semibold text-gray-900 dark:text-white"
+              >
+                {{ order.created_at.strftime('%d.%m.%Y') }}
+              </dd>
+            </dl>
+
+            <dl class="w-1/2 sm:w-1/5 md:flex-1 lg:w-auto">
+              <dt
+                class="text-base font-medium text-gray-500 dark:text-gray-400"
+              >
+                Price:
+              </dt>
+              <dd
+                class="mt-1.5 text-base font-semibold text-gray-900 dark:text-white"
+              >
+                ₹{{ "%.2f"|format(order.total_price) }}
+              </dd>
+            </dl>
+
+            <dl class="w-1/2 sm:w-1/4 sm:flex-1 lg:w-auto">
+              <dt
+                class="text-base font-medium text-gray-500 dark:text-gray-400"
+              >
+                Status:
+              </dt>
+              <dd
+                class="mt-1.5 inline-flex items-center rounded px-2.5 py-0.5 text-xs font-medium {% if order.status == 'Completed' %} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 {% elif order.status == 'Cancelled' %} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 {% else %} bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 {% endif %}"
+              >
+                {% if order.status == 'Completed' %}
+                <svg
+                  class="me-1 h-3 w-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 11.917 9.724 16.5 19 7.5"
+                  />
+                </svg>
+                {% elif order.status == 'Cancelled' %}
+                <svg
+                  class="me-1 h-3 w-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18 17.94 6M18 18 6.06 6"
+                  />
+                </svg>
+                {% else %}
+                <svg
+                  class="me-1 h-3 w-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 7h6l2 4m-8-4v8m0-8V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v9h2m8 0H9m4 0h2m4 0h2v-4m0 0h-5m3.5 5.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm-10 0a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+                  />
+                </svg>
+                {% endif %} {{ order.status }}
+              </dd>
+            </dl>
+
+            <div
+              class="w-full sm:flex sm:w-32 sm:items-center sm:justify-end sm:gap-4"
+            >
+              <button
+                id="actionsMenuDropdownModal{{ order.id }}"
+                data-dropdown-toggle="dropdownOrderModal{{ order.id }}"
+                type="button"
+                class="flex w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700 md:w-auto"
+              >
+                Actions
+                <svg
+                  class="-me-0.5 ms-1.5 h-4 w-4"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m19 9-7 7-7-7"
+                  />
+                </svg>
+              </button>
+              <!-- Dropdown menu -->
+              <div
+                id="dropdownOrderModal{{ order.id }}"
+                class="z-10 hidden w-40 divide-y divide-gray-100 rounded-lg bg-white shadow dark:bg-gray-700"
+              >
+                <ul
+                  class="p-2 text-left text-sm font-medium text-gray-500 dark:text-gray-400"
+                >
+                  <li>
+                    <a
+                      href="#"
+                      class="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+                    >
+                      <svg
+                        class="me-1.5 h-4 w-4 text-gray-400 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke="currentColor"
+                          stroke-width="2"
+                          d="M21 12c0 1.2-4.03 6-9 6s-9-4.8-9-6c0-1.2 4.03-6 9-6s9 4.8 9 6Z"
+                        />
+                        <path
+                          stroke="currentColor"
+                          stroke-width="2"
+                          d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                        />
+                      </svg>
+                      Order details
+                    </a>
+                  </li>
+                  {% if order.status == 'Pending' %}
+                  <li>
+                    <a
+                      href="#"
+                      data-modal-target="deleteOrderModal{{ order.id }}"
+                      data-modal-toggle="deleteOrderModal{{ order.id }}"
+                      class="group inline-flex w-full items-center rounded-md px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                    >
+                      <svg
+                        class="me-1.5 h-4 w-4"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
+                        />
+                      </svg>
+                      Cancel order
+                    </a>
+                  </li>
+                  {% endif %}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div
+            id="deleteOrderModal{{ order.id }}"
+            tabindex="-1"
+            aria-hidden="true"
+            class="fixed left-0 right-0 top-0 z-50 hidden h-modal w-full items-center justify-center overflow-y-auto overflow-x-hidden md:inset-0 md:h-full"
+          >
+            <div class="relative h-full w-full max-w-md p-4 md:h-auto">
+              <!-- Modal content -->
+              <div
+                class="relative rounded-lg bg-white p-4 text-center shadow dark:bg-gray-800 sm:p-5"
+              >
+                <button
+                  type="button"
+                  class="absolute right-2.5 top-2.5 ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
+                  data-modal-toggle="deleteOrderModal{{ order.id }}"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="h-5 w-5"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    ></path>
+                  </svg>
+                  <span class="sr-only">Close modal</span>
+                </button>
+                <div
+                  class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 p-2 dark:bg-gray-700"
+                >
+                  <svg
+                    class="h-8 w-8 text-gray-500 dark:text-gray-400"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
+                    />
+                  </svg>
+                  <span class="sr-only">Warning icon</span>
+                </div>
+                <p class="mb-4 text-gray-500 dark:text-gray-300">
+                  Are you sure you want to cancel this order? This action cannot
+                  be undone.
+                </p>
+                <div class="flex items-center justify-center space-x-4">
+                  <button
+                    data-modal-toggle="deleteOrderModal{{ order.id }}"
+                    type="button"
+                    class="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus:z-10 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:border-gray-500 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white dark:focus:ring-gray-600"
+                  >
+                    No, keep it
+                  </button>
+                  <form
+                    action="{{ url_for('cancel_order', order_id=order.id) }}"
+                    method="POST"
+                    class="inline"
+                  >
+                    <button
+                      type="submit"
+                      class="rounded-lg bg-red-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                    >
+                      Yes, cancel it
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %} {% else %}
+          <div
+            class="flex flex-col items-center justify-center py-12 text-center"
+          >
+            <svg
+              class="mb-4 h-16 w-16 text-gray-400"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 10V6a3 3 0 0 1 3-3v0a3 3 0 0 1 3 3v4m3-2 .917 11.923A1 1 0 0 1 17.92 21H6.08a1 1 0 0 1-.997-1.077L6 8h12Z"
+              />
+            </svg>
+
+            <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
+              No orders yet
+            </h3>
+            <p class="mb-4 text-gray-500 dark:text-gray-400">
+              Start shopping and your orders will appear here!
+            </p>
+            <a
+              href="{{ url_for('home') }}"
+              class="inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+            >
+              <svg
+                class="me-2 h-4 w-4"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 12h14m-7-7 7 7-7 7"
+                />
+              </svg>
+              Start Shopping
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Account Information Modal -->
+      <div
+        id="accountInformationModal2"
+        tabindex="-1"
+        aria-hidden="true"
+        class="max-h-auto fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden antialiased md:inset-0"
+      >
+        <div class="max-h-auto relative max-h-full w-full max-w-lg p-4">
+          <!-- Modal content -->
+          <div class="relative rounded-lg bg-white shadow dark:bg-gray-800">
+            <!-- Modal header -->
+            <div
+              class="flex items-center justify-between rounded-t border-b border-gray-200 p-4 dark:border-gray-700 md:p-5"
+            >
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Account Information
+              </h3>
+              <button
+                type="button"
+                class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white"
+                data-modal-toggle="accountInformationModal2"
+              >
+                <svg
+                  class="h-3 w-3"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 14 14"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                  />
+                </svg>
+                <span class="sr-only">Close modal</span>
+              </button>
+            </div>
+            <!-- Modal body -->
+            <form
+              class="p-4 md:p-5"
+              method="POST"
+              action="{{ url_for('account') }}"
+            >
+              <div class="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div class="col-span-2 sm:col-span-1">
+                  <label
+                    for="first_name"
+                    class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    First Name*
+                  </label>
+                  <input
+                    type="text"
+                    id="first_name"
+                    name="first_name"
+                    class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
+                    value="{{ user.first_name }}"
+                    required
+                  />
+                </div>
+
+                <div class="col-span-2 sm:col-span-1">
+                  <label
+                    for="last_name"
+                    class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Last Name*
+                  </label>
+                  <input
+                    type="text"
+                    id="last_name"
+                    name="last_name"
+                    class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
+                    value="{{ user.last_name }}"
+                    required
+                  />
+                </div>
+                <div class="col-span-2">
+                  <label
+                    for="phone_number"
+                    class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Phone Number*
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
+                    value="{{ user.email }}"
+                    required
+                  />
+                </div>
+
+                <div class="col-span-2">
+                  <label
+                    for="phone_number"
+                    class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Phone Number*
+                  </label>
+                  <input
+                    type="text"
+                    id="phone_number"
+                    name="phone_number"
+                    class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
+                    value="{{ user.phone_number }}"
+                    required
+                  />
+                </div>
+
+                <div class="col-span-2">
+                  <label
+                    for="address"
+                    class="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Address*
+                  </label>
+                  <textarea
+                    id="address"
+                    name="address"
+                    rows="4"
+                    class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500"
+                    required
+                  >
+{{ user.address }}</textarea
+                  >
+                </div>
+              </div>
+
+              <div
+                class="border-t border-gray-200 pt-4 dark:border-gray-700 md:pt-5"
+              >
+                <button
+                  type="submit"
+                  class="me-2 inline-flex items-center rounded-lg bg-primary-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                >
+                  Save information
+                </button>
+                <button
+                  type="button"
+                  data-modal-toggle="accountInformationModal2"
+                  class="me-2 rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+  </body>
+</html>
