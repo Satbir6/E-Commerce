@@ -33,6 +33,7 @@ from sqlalchemy.sql import func
 from pytz import timezone
 import uuid
 
+
 import logging
 from logging.handlers import RotatingFileHandler
 
@@ -181,6 +182,7 @@ def allowed_file(filename):
 def slice_filter(iterable, limit):
     """Custom filter to slice an iterable to a specified limit."""
     return list(iterable)[:limit]
+
 
 
 ###############################################################################################################################################
@@ -372,6 +374,44 @@ def cancel_order(order_id):
     return redirect(url_for("account"))
 
 
+###############################################################################################################################################
+# Seller Routes
+###############################################################################################################################################
+
+@app.route("/seller_dashboard")
+@login_required
+def seller_dashboard():
+    if not current_user.is_seller:
+        flash("You don't have permission to access the seller dashboard.", "error")
+        return redirect(url_for("home"))
+
+    # Get seller's products
+    products = Product.query.filter_by(supplier_id=current_user.id).all()
+
+    # Get orders containing seller's products
+    seller_product_ids = [p.id for p in products]
+    orders = (
+        Order.query.join(OrderItem)
+        .filter(OrderItem.product_id.in_(seller_product_ids))
+        .distinct()
+        .all()
+    )
+
+    # Get pending orders
+    pending_orders = [order for order in orders if order.status == "Pending"]
+
+    # Get low stock products (less than 10 items)
+    low_stock_products = [product for product in products if product.stock < 10]
+
+    return render_template(
+        "seller/dashboard.html",
+        user=current_user,
+        products=products,
+        orders=orders,
+        pending_orders=pending_orders,
+        low_stock_products=low_stock_products,
+    )
+
 @app.route("/add_product", methods=["POST"])
 @login_required
 def add_product():
@@ -477,61 +517,25 @@ def update_order_status(order_id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-
-@app.route("/seller_dashboard")
-@login_required
-def seller_dashboard():
-    if not current_user.is_seller:
-        flash("You don't have permission to access the seller dashboard.", "error")
-        return redirect(url_for("home"))
-
-    # Get seller's products
-    products = Product.query.filter_by(supplier_id=current_user.id).all()
-
-    # Get orders containing seller's products
-    seller_product_ids = [p.id for p in products]
-    orders = (
-        Order.query.join(OrderItem)
-        .filter(OrderItem.product_id.in_(seller_product_ids))
-        .distinct()
-        .all()
-    )
-
-    # Get pending orders
-    pending_orders = [order for order in orders if order.status == "Pending"]
-
-    # Get low stock products (less than 10 items)
-    low_stock_products = [product for product in products if product.stock < 10]
-
-    return render_template(
-        "seller/dashboard.html",
-        user=current_user,
-        products=products,
-        orders=orders,
-        pending_orders=pending_orders,
-    )
-
-
 @app.route("/edit_product/<product_id>", methods=["POST"])
 @login_required
 def edit_product(product_id):
-    if current_user.role != "seller":
-        flash("Access denied", "error")
-        return redirect(url_for("home"))
-
+    if not current_user.is_seller:
+        flash("You don't have permission to edit products.", "error")
+        return redirect(url_for("seller_dashboard"))
     product = Product.query.get_or_404(product_id)
 
     # Verify product belongs to current user
-    if product.seller_id != current_user.id:
-        flash("Access denied", "error")
+    if product.supplier_id != current_user.id:
+        flash("You don't have permission to edit this product.", "error")
         return redirect(url_for("seller_dashboard"))
 
     # Update product details
-    product.name = request.form["name"]
-    product.description = request.form["description"]
-    product.category = request.form["category"]
-    product.price = float(request.form["price"])
-    product.stock = int(request.form["stock"])
+    product.name = request.form.get("name")
+    product.description = request.form.get("description")
+    product.category = request.form.get("category")
+    product.price = float(request.form.get("price"))
+    product.stock = int(request.form.get("stock"))
 
     # Handle image upload if provided
     if "image" in request.files and request.files["image"].filename:
