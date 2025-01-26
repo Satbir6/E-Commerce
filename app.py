@@ -385,28 +385,40 @@ def seller_dashboard():
         flash("You don't have permission to access the seller dashboard.", "error")
         return redirect(url_for("home"))
 
-    # Get seller's products
-    products = Product.query.filter_by(supplier_id=current_user.id).all()
+    # Get page number from query parameters, default to 1
+    page = request.args.get('page', 1, type=int)
+    per_page = 5  # Number of items per page
+
+    # Get seller's products with pagination, ordered by created_at desc
+    products_pagination = Product.query.filter_by(supplier_id=current_user.id)\
+        .order_by(Product.created_at.desc())\
+        .paginate(page=page, per_page=per_page, error_out=False)
+
+    # Get all products for the edit modals (needed for the full list)
+    products = Product.query.filter_by(supplier_id=current_user.id)\
+        .order_by(Product.created_at.desc())\
+        .all()
 
     # Get orders containing seller's products
-    seller_product_ids = [p.id for p in products]
-    orders = (
-        Order.query.join(OrderItem)
-        .filter(OrderItem.product_id.in_(seller_product_ids))
-        .distinct()
+    seller_product_ids = [p.id for p in Product.query.filter_by(supplier_id=current_user.id).all()]
+    orders = Order.query.join(OrderItem)\
+        .filter(OrderItem.product_id.in_(seller_product_ids))\
+        .distinct()\
         .all()
-    )
 
     # Get pending orders
     pending_orders = [order for order in orders if order.status == "Pending"]
 
     # Get low stock products (less than 10 items)
-    low_stock_products = [product for product in products if product.stock < 10]
+    low_stock_products = Product.query.filter_by(supplier_id=current_user.id)\
+        .filter(Product.stock < 10)\
+        .all()
 
     return render_template(
         "seller/dashboard.html",
         user=current_user,
-        products=products,
+        products_pagination=products_pagination,
+        products=products,  # Add this for the edit modals
         orders=orders,
         pending_orders=pending_orders,
         low_stock_products=low_stock_products,
@@ -442,6 +454,8 @@ def add_product():
         else:
             image_path = None
 
+        created_at = datetime.now(timezone("Asia/Kolkata"))
+
         new_product = Product(
             name=name,
             description=description,
@@ -450,6 +464,7 @@ def add_product():
             stock=stock,
             image=image_path,
             supplier_id=current_user.id,
+            created_at=created_at,
         )
 
         db.session.add(new_product)

@@ -17,9 +17,66 @@
   </head>
 
   <body class="bg-gray-50">
-    {% include 'components/navbar.html' %}
+
     <!-- Main Content -->
-    <div class="p-4 pt-20">
+    <div class="p-4 pt-6">
+      <nav class="mb-4 flex" aria-label="Breadcrumb">
+        <ol
+          class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse"
+        >
+          <li class="inline-flex items-center">
+            <a
+              href="{{url_for('home')}}"
+              class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-white"
+            >
+              <svg
+                class="me-2 h-4 w-4"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m4 12 8-8 8 8M6 10.5V19a1 1 0 0 0 1 1h3v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h3a1 1 0 0 0 1-1v-8.5"
+                />
+              </svg>
+              Home
+            </a>
+          </li>
+
+          <li aria-current="page">
+            <div class="flex items-center">
+              <svg
+                class="mx-1 h-4 w-4 text-gray-400 rtl:rotate-180"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="m9 5 7 7-7 7"
+                />
+              </svg>
+              <span
+                class="ms-1 text-sm font-medium text-gray-500 dark:text-gray-400 md:ms-2"
+                >My Account</span
+              >
+            </div>
+          </li>
+        </ol>
+      </nav>
       <!-- Stats Overview -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <div class="bg-white rounded-lg shadow p-4">
@@ -159,7 +216,7 @@
               </tr>
             </thead>
             <tbody>
-              {% for product in products %}
+              {% for product in products_pagination.items %}
               <tr class="bg-white border-b">
                 <td
                   class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
@@ -188,6 +245,86 @@
               {% endfor %}
             </tbody>
           </table>
+
+          <!-- Pagination Controls -->
+          {% if products_pagination.pages > 1 %}
+          <div class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+            <div class="flex flex-1 justify-between sm:hidden">
+              {% if products_pagination.has_prev %}
+              <a href="{{ url_for('seller_dashboard', page=products_pagination.prev_num) }}" 
+                 class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                  Previous
+              </a>
+              {% endif %}
+              {% if products_pagination.has_next %}
+              <a href="{{ url_for('seller_dashboard', page=products_pagination.next_num) }}" 
+                 class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                  Next
+              </a>
+              {% endif %}
+            </div>
+            <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+              <div>
+                <p class="text-sm text-gray-700">
+                  Showing
+                  <span class="font-medium">{{ (products_pagination.page - 1) * products_pagination.per_page + 1 }}</span>
+                  to
+                  <span class="font-medium">
+                      {% set last_item = products_pagination.page * products_pagination.per_page %}
+                      {% if last_item > products_pagination.total %}
+                          {{ products_pagination.total }}
+                      {% else %}
+                          {{ last_item }}
+                      {% endif %}
+                  </span>
+                  of
+                  <span class="font-medium">{{ products_pagination.total }}</span>
+                  results
+                </p>
+              </div>
+              <div>
+                <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                  {% if products_pagination.has_prev %}
+                  <a href="{{ url_for('seller_dashboard', page=products_pagination.prev_num) }}" 
+                     class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                    <span class="sr-only">Previous</span>
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+                    </svg>
+                  </a>
+                  {% endif %}
+
+                  {% for page_num in products_pagination.iter_pages(left_edge=2, left_current=2, right_current=2, right_edge=2) %}
+                    {% if page_num %}
+                      {% if products_pagination.page == page_num %}
+                      <span class="relative z-10 inline-flex items-center bg-blue-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        {{ page_num }}
+                      </span>
+                      {% else %}
+                      <a href="{{ url_for('seller_dashboard', page=page_num) }}" 
+                         class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                        {{ page_num }}
+                      </a>
+                      {% endif %}
+                    {% else %}
+                      <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700">...</span>
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if products_pagination.has_next %}
+                  <a href="{{ url_for('seller_dashboard', page=products_pagination.next_num) }}" 
+                     class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                    <span class="sr-only">Next</span>
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                    </svg>
+                  </a>
+                  {% endif %}
+                </nav>
+              </div>
+            </div>
+          </div>
+          {% endif %}
         </div>
       </div>
 
