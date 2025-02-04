@@ -304,9 +304,21 @@ def logout():
     return redirect(url_for("home"))
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
 def home():
-    return render_template("home.html", user=current_user)
+    page = request.args.get('page', 1, type=int)
+    per_page = 12
+    
+    # Get products with pagination
+    products = Product.query.order_by(Product.created_at.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    
+    if request.headers.get('HX-Request'):
+        # Return only the product grid for HTMX requests
+        return render_template("partials/product_grid.html", products=products)
+    
+    return render_template("home.html", products=products, user=current_user)
 
 
 @app.route("/account", methods=["GET", "POST"])

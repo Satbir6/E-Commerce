@@ -1,0 +1,51 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {% for product in products.items %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden dark:bg-gray-800 transition-transform hover:scale-105">
+        {% if product.image %}
+        <img src="{{ url_for('static', filename='dist/product_images/' + product.image) }}" 
+             alt="{{ product.name }}" 
+             class="w-full h-48 object-cover">
+        {% else %}
+        <img src="{{ url_for('static', filename='images/placeholder.png') }}" 
+             alt="No image" 
+             class="w-full h-48 object-cover">
+        {% endif %}
+        <div class="p-4">
+            <h2 class="text-lg font-bold dark:text-white">{{ product.name }}</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{{ product.description }}</p>
+            <div class="mt-4 flex justify-between items-center">
+                <span class="text-lg font-bold text-primary-600">₹{{ "%.2f"|format(product.price) }}</span>
+                <div class="flex items-center">
+                    <span class="text-yellow-400">★</span>
+                    <span class="ml-1 text-sm text-gray-600 dark:text-gray-400">{{ "%.1f"|format(product.rating) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+<div class="mt-8 flex justify-center items-center space-x-2">
+    {% if products.has_prev %}
+    <button class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+            hx-get="{{ url_for('home', page=products.prev_num) }}"
+            hx-target="#product-grid"
+            hx-swap="innerHTML transition:true">
+        Previous
+    </button>
+    {% endif %}
+    
+    <span class="px-4 py-2 text-gray-700 dark:text-gray-300">
+        Page {{ products.page }} of {{ products.pages }}
+    </span>
+    
+    {% if products.has_next %}
+    <button class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+            hx-get="{{ url_for('home', page=products.next_num) }}"
+            hx-target="#product-grid"
+            hx-swap="innerHTML transition:true">
+        Next
+    </button>
+    {% endif %}
+</div> 
