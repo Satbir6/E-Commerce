@@ -1,5 +1,5 @@
 <aside
-  class="fixed top-0 left-0 z-40 w-60 h-screen pt-14 transition-transform -translate-x-full bg-white border-r border-gray-200 md:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
+  class="fixed top-0 left-0 z-40 w-72 h-screen pt-14 transition-transform -translate-x-full bg-white border-r border-gray-200 md:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
   aria-label="Sidenav"
   id="drawer-navigation"
 >
@@ -71,28 +71,28 @@
             </button>
             <ul id="dropdown-electronics" class="hidden py-2 space-y-2">
               <li>
-                <button
-                  data-category="Mobile Phones"
-                  class="category-link flex items-center p-2 pl-16 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                >Mobile Phones</button>
+                <div class="flex items-center p-2 pl-16">
+                  <input id="mobile-phones-checkbox" type="checkbox" data-category="Mobile Phones" class="category-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                  <label for="mobile-phones-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Mobile Phones</label>
+                </div>
               </li>
               <li>
-                <button
-                  data-category="Laptops"
-                  class="category-link flex items-center p-2 pl-16 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                >Laptops</button>
+                <div class="flex items-center p-2 pl-16">
+                  <input id="laptops-checkbox" type="checkbox" data-category="Laptops" class="category-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                  <label for="laptops-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Laptops</label>
+                </div>
               </li>
               <li>
-                <button
-                  data-category="Tablets"
-                  class="category-link flex items-center p-2 pl-16 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                >Tablets</button>
+                <div class="flex items-center p-2 pl-16">
+                  <input id="tablets-checkbox" type="checkbox" data-category="Tablets" class="category-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                  <label for="tablets-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Tablets</label>
+                </div>
               </li>
               <li>
-                <button
-                  data-category="Accessories"
-                  class="category-link flex items-center p-2 pl-16 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                >Accessories</button>
+                <div class="flex items-center p-2 pl-16">
+                  <input id="accessories-checkbox" type="checkbox" data-category="Accessories" class="category-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                  <label for="accessories-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Accessories</label>
+                </div>
               </li>
             </ul>
           </li>
@@ -122,28 +122,28 @@
             </button>
             <ul id="dropdown-fashion" class="hidden py-2 space-y-2">
               <li>
-                <button
-                  data-category="Men"
-                  class="category-link flex items-center p-2 pl-16 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                >Men</button>
+                <div class="flex items-center p-2 pl-16">
+                  <input id="men-checkbox" type="checkbox" data-category="Men" class="category-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                  <label for="men-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Men</label>
+                </div>
               </li>
               <li>
-                <button
-                  data-category="Women"
-                  class="category-link flex items-center p-2 pl-16 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                >Women</button>
+                <div class="flex items-center p-2 pl-16">
+                  <input id="women-checkbox" type="checkbox" data-category="Women" class="category-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                  <label for="women-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Women</label>
+                </div>
               </li>
               <li>
-                <button
-                  data-category="Kids"
-                  class="category-link flex items-center p-2 pl-16 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                >Kids</button>
+                <div class="flex items-center p-2 pl-16">
+                  <input id="kids-checkbox" type="checkbox" data-category="Kids" class="category-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                  <label for="kids-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Kids</label>
+                </div>
               </li>
               <li>
-                <button
-                  data-category="Shoes"
-                  class="category-link flex items-center p-2 pl-16 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                >Shoes</button>
+                <div class="flex items-center p-2 pl-16">
+                  <input id="shoes-checkbox" type="checkbox" data-category="Shoes" class="category-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                  <label for="shoes-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Shoes</label>
+                </div>
               </li>
             </ul>
           </li>
@@ -172,28 +172,28 @@
             </button>
             <ul id="dropdown-Home-and-Kitchen" class="hidden py-2 space-y-2">
               <li>
-                <button
-                  data-category="Appliances"
-                  class="category-link flex items-center p-2 pl-16 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                >Appliances</button>
+                <div class="flex items-center p-2 pl-16">
+                  <input id="appliances-checkbox" type="checkbox" data-category="Appliances" class="category-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                  <label for="appliances-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Appliances</label>
+                </div>
               </li>
               <li>
-                <button
-                  data-category="Furniture"
-                  class="category-link flex items-center p-2 pl-16 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                >Furniture</button>
+                <div class="flex items-center p-2 pl-16">
+                  <input id="furniture-checkbox" type="checkbox" data-category="Furniture" class="category-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                  <label for="furniture-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Furniture</label>
+                </div>
               </li>
               <li>
-                <button
-                  data-category="Home Decor"
-                  class="category-link flex items-center p-2 pl-16 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                >Home Decor</button>
+                <div class="flex items-center p-2 pl-16">
+                  <input id="home-decor-checkbox" type="checkbox" data-category="Home Decor" class="category-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                  <label for="home-decor-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Home Decor</label>
+                </div>
               </li>
               <li>
-                <button
-                  data-category="Kitchenware"
-                  class="category-link flex items-center p-2 pl-16 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                >Kitchenware</button>
+                <div class="flex items-center p-2 pl-16">
+                  <input id="kitchenware-checkbox" type="checkbox" data-category="Kitchenware" class="category-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                  <label for="kitchenware-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Kitchenware</label>
+                </div>
               </li>
             </ul>
           </li>
@@ -429,7 +429,7 @@
         <ul id="dropdown-Quick-Links" class="py-2 space-y-2">
           <li>
             <a
-              href="#"
+              href="{{ url_for('offers') }}"
               class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
               >Offers/Deals</a
             >
@@ -443,7 +443,7 @@
           </li>
           <li>
             <a
-              href="#"
+              href="{{ url_for('recently_viewed') }}"
               class="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
               >Recently Viewed</a
             >
@@ -457,26 +457,33 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Function to get selected categories
+    function getSelectedCategories() {
+        const checkboxes = document.querySelectorAll('.category-checkbox:checked');
+        return Array.from(checkboxes).map(cb => cb.dataset.category);
+    }
+
     // Function to apply filters
     function applyFilters(page = 1) {
-        const activeCategory = document.querySelector('.category-link.active');
-        const category = activeCategory ? activeCategory.dataset.category : 'all';
+        const selectedCategories = getSelectedCategories();
         const priceRange = document.getElementById('price-range').value;
         const rating = document.querySelector('.rating-link.active')?.dataset.rating;
 
-        console.log('Applying filters:', { category, priceRange, rating, page });
+        console.log('Applying filters:', { selectedCategories, priceRange, rating, page });
 
-        const formData = new FormData();
-        formData.append('category', category);
-        formData.append('max_price', priceRange);
-        if (rating) formData.append('rating', rating);
+        const data = {
+            categories: selectedCategories,
+            priceRange: priceRange,
+            rating: rating
+        };
 
-        // Add the page parameter to the URL
-        const url = `/filter_products?page=${page}`;
-
-        fetch(url, {
+        fetch('/filter_products', {
             method: 'POST',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(data)
         })
         .then(response => {
             if (!response.ok) {
@@ -525,33 +532,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         priceSlider.addEventListener('input', function() {
             maxPriceDisplay.textContent = this.value;
+        });
+
+        priceSlider.addEventListener('change', function() {
             applyFilters();
         });
     }
 
-    // Handle category clicks
-    document.querySelectorAll('.category-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Remove active class from all category links
-            document.querySelectorAll('.category-link').forEach(l => {
-                l.classList.remove('active');
-                l.classList.remove('bg-gray-100');
-            });
-            
-            // Add active class to clicked link
-            this.classList.add('active');
-            this.classList.add('bg-gray-100');
-            
-            // Reset price range to max when category is clicked
-            if (priceSlider) {
-                priceSlider.value = priceSlider.max;
-                maxPriceDisplay.textContent = priceSlider.max;
-            }
-            
-            console.log('Category clicked:', this.dataset.category);
+    // Handle category checkbox changes
+    document.querySelectorAll('.category-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
             applyFilters();
         });
     });

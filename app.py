@@ -310,7 +310,7 @@ def filter_products():
         # Handle both JSON and form data
         if request.is_json:
             data = request.get_json()
-            category = data.get('category')
+            categories = data.get('categories', [])
             price_range = data.get('priceRange')
             min_rating = float(data.get('rating')) if data.get('rating') else None
             
@@ -322,7 +322,7 @@ def filter_products():
                 min_price = None
                 max_price = None
         else:
-            category = request.form.get('category') or request.args.get('category')
+            categories = request.form.getlist('categories[]') or request.args.getlist('categories[]')
             min_price = request.form.get('min_price') or request.args.get('min_price')
             max_price = request.form.get('max_price') or request.args.get('max_price')
             min_rating = request.form.get('rating') or request.args.get('rating')
@@ -335,10 +335,11 @@ def filter_products():
         # Start with base query
         query = Product.query
         
-        # Apply filters
-        if category and category != "all":
-            # Make case-insensitive comparison
-            query = query.filter(func.lower(Product.category) == func.lower(category))
+        # Apply category filter if categories are selected
+        if categories:
+            # Use OR condition for multiple categories
+            query = query.filter(Product.category.in_(categories))
+            
         if min_price is not None:
             query = query.filter(Product.price >= min_price)
         if max_price is not None:
@@ -791,6 +792,111 @@ def add_review(product_id):
         print(f"Error: {e}")
     
     return redirect(url_for("product_page", product_id=product_id))
+
+@app.context_processor
+def inject_cart_data():
+    cart_items = []
+    cart_count = 0
+    if current_user.is_authenticated:
+        cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
+        cart_count = sum(item.quantity for item in cart_items)
+    return dict(cart_items=cart_items, cart_count=cart_count)
+
+@app.route("/cart")
+@login_required
+def cart():
+    cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
+    
+    # Calculate order summary
+    subtotal = sum(item.quantity * item.product.price for item in cart_items)
+    shipping = subtotal * 0.015  # 1.5% shipping fee
+    tax = subtotal * 0.18  # 18% tax
+    total = subtotal + shipping + tax
+    
+    # Get min and max prices for the sidebar
+    min_price = db.session.query(func.min(Product.price)).scalar() or 0
+    max_price = db.session.query(func.max(Product.price)).scalar() or 10000
+    
+    return render_template("cart.html", 
+                         cart_items=cart_items,
+                         subtotal=subtotal,
+                         shipping=shipping,
+                         tax=tax,
+                         total=total,
+                         user=current_user,
+                         min_price=min_price,
+                         max_price=max_price)
+
+@app.route("/update_cart/<int:product_id>", methods=["POST"])
+@login_required
+def update_cart(product_id):
+    data = request.get_json()
+    quantity = data.get('quantity', 1)
+    
+    product = Product.query.get_or_404(product_id)
+    if quantity > product.stock:
+        return jsonify({
+            "error": f"Only {product.stock} items available in stock",
+            "available_stock": product.stock
+        }), 400
+    
+    cart_item = CartItem.query.filter_by(user_id=current_user.id, product_id=product_id).first()
+    if cart_item:
+        cart_item.quantity = quantity
+        db.session.commit()
+        
+        # Recalculate cart totals
+        cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
+        subtotal = sum(item.quantity * item.product.price for item in cart_items)
+        shipping = subtotal * 0.015
+        tax = subtotal * 0.18
+        total = subtotal + shipping + tax
+        
+        return jsonify({
+            "message": "Cart updated successfully",
+            "item_total": cart_item.quantity * cart_item.product.price,
+            "subtotal": subtotal,
+            "shipping": shipping,
+            "tax": tax,
+            "total": total,
+            "quantity": quantity
+        })
+    
+    return jsonify({"error": "Item not found in cart"}), 404
+
+@app.route("/remove_from_cart/<int:product_id>", methods=["POST"])
+@login_required
+def remove_from_cart(product_id):
+    cart_item = CartItem.query.filter_by(user_id=current_user.id, product_id=product_id).first()
+    if cart_item:
+        db.session.delete(cart_item)
+        db.session.commit()
+    
+    return jsonify({"message": "Item removed from cart successfully"})
+
+@app.route("/offers")
+def offers():
+    # Get min and max prices for the sidebar
+    min_price = db.session.query(func.min(Product.price)).scalar() or 0
+    max_price = db.session.query(func.max(Product.price)).scalar() or 10000
+    
+    return render_template("coming_soon.html", 
+                         page_title="Offers & Deals",
+                         min_price=min_price,
+                         user=current_user,
+                         max_price=max_price)
+
+@app.route("/recently-viewed")
+def recently_viewed():
+    # Get min and max prices for the sidebar
+    min_price = db.session.query(func.min(Product.price)).scalar() or 0
+    max_price = db.session.query(func.max(Product.price)).scalar() or 10000
+    
+    return render_template("coming_soon.html", 
+                         page_title="Recently Viewed",
+                         min_price=min_price,
+                         user=current_user,
+                         max_price=max_price)
 
 # Run the application
 if __name__ == "__main__":

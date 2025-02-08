@@ -84,21 +84,48 @@
         <div
           class="block py-2 px-4 text-base font-medium text-center text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
         >
-          Cart
+          Cart ({{ cart_count if cart_count else 0 }})
         </div>
         <div>
-          <a
-            href="#"
-            class="flex py-3 px-4 border-b hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600"
-          >
-            <div class="pl-3 w-full">
-              <div
-                class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400"
-              >
-                No items added
+          {% if cart_items %}
+            {% for item in cart_items %}
+            <a
+              href="{{ url_for('product_page', product_id=item.product.id) }}"
+              class="flex py-3 px-4 border-b hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600"
+            >
+              <div class="flex items-center">
+                {% if item.product.image %}
+                  <img class="w-12 h-12 object-cover rounded" src="{{ url_for('static', filename='dist/product_images/' + item.product.image) }}" alt="{{ item.product.name }}">
+                {% else %}
+                  <div class="w-12 h-12 bg-gray-200 rounded"></div>
+                {% endif %}
+                <div class="pl-3">
+                  <div class="text-gray-700 font-semibold dark:text-white">{{ item.product.name }}</div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">Qty: {{ item.quantity }}</div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">₹{{ "%.2f"|format(item.product.price) }}</div>
+                </div>
               </div>
+            </a>
+            {% endfor %}
+            <div class="p-3">
+              <a href="{{ url_for('cart') }}" class="block w-full text-center bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+                View Cart
+              </a>
             </div>
-          </a>
+          {% else %}
+            <a
+              href="#"
+              class="flex py-3 px-4 border-b hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600"
+            >
+              <div class="pl-3 w-full">
+                <div
+                  class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400"
+                >
+                  No items added
+                </div>
+              </div>
+            </a>
+          {% endif %}
         </div>
       </div>
       <button

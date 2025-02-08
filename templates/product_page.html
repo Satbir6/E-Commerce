@@ -55,10 +55,6 @@
                     ₹{{ "%.2f"|format(product.price) }}
                 </div>
                 
-                <p class="text-gray-600 dark:text-gray-400 mb-6">
-                    {{ product.description }}
-                </p>
-                
                 <div class="mb-6">
                     <span class="text-gray-600 dark:text-gray-400">
                         {% if product.stock > 0 %}
@@ -69,26 +65,25 @@
                     </span>
                 </div>
 
+
+
                 <!-- Quantity Selector -->
-                <div class="flex items-center space-x-4 mb-6">
-                    <label class="text-gray-600 dark:text-gray-400">Quantity:</label>
-                    <div class="flex items-center border rounded-lg">
-                        <button onclick="updateQuantity(-1)" 
-                                class="px-3 py-1 border-r hover:bg-gray-100 dark:hover:bg-gray-700">
-                            -
-                        </button>
-                        <input type="number" 
-                               id="quantity" 
-                               value="1" 
-                               min="1" 
-                               max="{{ product.stock }}"
-                               class="w-16 text-center border-none focus:ring-0"
-                               onchange="validateQuantity(this)">
-                        <button onclick="updateQuantity(1)" 
-                                class="px-3 py-1 border-l hover:bg-gray-100 dark:hover:bg-gray-700">
-                            +
-                        </button>
-                    </div>
+                <div class="flex items-center space-x-4 mb-6"> 
+                    <button onclick="updateQuantity({{ product.id }}, -1, {{ product.stock }})" 
+                            class="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-l-lg transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                        </svg>
+                    </button>
+                    <span class="px-6 py-2 font-medium text-gray-900" id="quantity-{{ product.id }}">
+                        {{ product.quantity if product.quantity is defined else 1 }}
+                    </span>
+                    <button onclick="updateQuantity({{ product.id }}, 1, {{ product.stock }})" 
+                            class="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-r-lg transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                    </button>
                 </div>
                 
                 <button onclick="addToCart({{ product.id }})"
@@ -100,9 +95,16 @@
                         Out of Stock
                     {% endif %}
                 </button>
+                <br><br>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                    {{ product.description }}
+                </p>
+                
+
             </div>
         </div>
     </div>
+
 
     <!-- Reviews Section -->
     <div class="mt-12 bg-white rounded-lg shadow-lg overflow-hidden dark:bg-gray-800 p-8">
@@ -187,13 +189,17 @@ function validateQuantity(input) {
     input.value = quantity;
 }
 
-function updateQuantity(change) {
-    const input = document.getElementById('quantity');
-    quantity = Math.max(1, Math.min(parseInt(input.value) + change, {{ product.stock }}));
-    input.value = quantity;
+function updateQuantity(productId, change, maxStock) {
+    const quantityElement = document.getElementById(`quantity-${productId}`);
+    let currentQuantity = parseInt(quantityElement.textContent);
+    let newQuantity = Math.max(1, Math.min(currentQuantity + change, maxStock));
+    
+    quantityElement.textContent = newQuantity;
 }
 
 function addToCart(productId) {
+    const quantity = parseInt(document.getElementById(`quantity-${productId}`).textContent);
+    
     fetch(`/add_to_cart/${productId}`, {
         method: 'POST',
         headers: {
@@ -204,22 +210,14 @@ function addToCart(productId) {
     .then(response => response.json())
     .then(data => {
         if (data.message) {
-            const toast = document.createElement('div');
-            toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-500';
-            toast.textContent = 'Added to cart successfully!';
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 500);
-            }, 3000);
+            showToast('Added to cart successfully!');
         } else {
-            alert('Error adding to cart. Please try again.');
+            showToast('Error adding to cart!', 'bg-red-500');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error adding to cart. Please try again.');
+        showToast('Error adding to cart!', 'bg-red-500');
     });
 }
 

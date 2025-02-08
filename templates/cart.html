@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QuickCart - Shopping Cart</title>
+    <link
+      rel="icon"
+      href="{{url_for('static',filename='dist/images/logo-removebg.png')}}"
+      type="image/png"
+    />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}" />
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  </head>
+
+  <body class="bg-gray-50">
+    {% include 'components/navbar.html' %}
+    
+    <div class="container mx-auto px-4  pb-16 mt-16 pt-8">
+      <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Shopping Cart</h1>
+        <a href="{{ url_for('home') }}" class="text-blue-600 hover:text-blue-700 flex items-center">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Continue Shopping
+        </a>
+      </div>
+
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Cart Items -->
+        <div class="lg:w-2/3">
+          {% if cart_items %}
+            {% for item in cart_items %}
+            <div class="bg-white rounded-lg shadow-sm mb-4 p-6 transition-transform hover:shadow-md">
+              <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="flex items-center space-x-6 mb-4 md:mb-0">
+                  {% if item.product.image %}
+                    <img src="{{ url_for('static', filename='dist/product_images/' + item.product.image) }}" 
+                         alt="{{ item.product.name }}" 
+                         class="w-28 h-28 object-cover rounded-lg shadow-sm">
+                  {% else %}
+                    <div class="w-28 h-28 bg-gray-200 rounded-lg"></div>
+                  {% endif %}
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ item.product.name }}</h3>
+                    <p class="text-2xl font-bold text-blue-600">₹{{ "%.2f"|format(item.product.price) }}</p>
+                    <p class="text-sm text-gray-500 mt-1">Item Total: ₹<span id="item-total-{{ item.product.id }}">{{ "%.2f"|format(item.product.price * item.quantity) }}</span></p>
+                    <p class="text-sm text-gray-500">Available: {{ item.product.stock }} items</p>
+                  </div>
+                </div>
+                <div class="flex flex-col items-end space-y-3">
+                  <div class="flex items-center border rounded-lg shadow-sm">
+                    <button onclick="updateQuantity({{ item.product.id }}, -1, {{ item.product.stock }})" 
+                            class="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-l-lg transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                      </svg>
+                    </button>
+                    <span class="px-6 py-2 font-medium text-gray-900" id="quantity-{{ item.product.id }}">
+                      {{ item.quantity }}
+                    </span>
+                    <button onclick="updateQuantity({{ item.product.id }}, 1, {{ item.product.stock }})" 
+                            class="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-r-lg transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <button onclick="removeFromCart({{ item.product.id }})" 
+                          class="text-red-500 hover:text-red-600 flex items-center transition-colors">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                      </path>
+                    </svg>
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="bg-white rounded-lg shadow-sm p-12 text-center">
+              <div class="mb-6">
+                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z">
+                  </path>
+                </svg>
+                <p class="text-xl text-gray-600 mb-4">Your cart is empty</p>
+                <a href="{{ url_for('home') }}" 
+                   class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                  Start Shopping
+                  <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Order Summary -->
+        <div class="lg:w-1/3">
+          <div class="bg-white rounded-lg shadow-sm p-6 sticky top-24">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Order Summary</h2>
+            <div class="space-y-4 mb-6">
+              <div class="flex justify-between text-gray-600">
+                <span>Subtotal</span>
+                <span class="font-medium">₹<span data-subtotal>{{ "%.2f"|format(subtotal) }}</span></span>
+              </div>
+              <div class="flex justify-between text-gray-600">
+                <span>Shipping (1.5%)</span>
+                <span class="font-medium">₹<span data-shipping>{{ "%.2f"|format(shipping) }}</span></span>
+              </div>
+              <div class="flex justify-between text-gray-600">
+                <span>Tax (18%)</span>
+                <span class="font-medium">₹<span data-tax>{{ "%.2f"|format(tax) }}</span></span>
+              </div>
+              <div class="border-t pt-4 mt-4">
+                <div class="flex justify-between">
+                  <span class="text-lg font-bold text-gray-900">Total</span>
+                  <span class="text-2xl font-bold text-blue-600">₹<span data-total>{{ "%.2f"|format(total) }}</span></span>
+                </div>
+              </div>
+            </div>
+            {% if cart_items %}
+            <button onclick="proceedToCheckout()" 
+                    class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-medium hover:bg-blue-700 
+                           transition-colors flex items-center justify-center">
+              Proceed to Checkout
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+              </svg>
+            </button>
+            <div class="mt-4 text-center">
+              <p class="text-sm text-gray-500">Secure Checkout</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+
+    <script>
+    function formatCurrency(amount) {
+        return parseFloat(amount).toFixed(2);
+    }
+
+    async function updateQuantity(productId, change, maxStock) {
+        const quantityElement = document.getElementById(`quantity-${productId}`);
+        let newQuantity = parseInt(quantityElement.textContent) + change;
+        
+        if (newQuantity < 1) {
+            newQuantity = 1;
+        } else if (newQuantity > maxStock) {
+            showToast(`Only ${maxStock} items available in stock`);
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/update_cart/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ quantity: newQuantity })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Update quantity
+                quantityElement.textContent = data.quantity;
+                
+                // Update item total
+                const itemTotalElement = document.getElementById(`item-total-${productId}`);
+                itemTotalElement.textContent = formatCurrency(data.item_total);
+                
+                // Update order summary
+                document.querySelector('[data-subtotal]').textContent = `₹${formatCurrency(data.subtotal)}`;
+                document.querySelector('[data-shipping]').textContent = `₹${formatCurrency(data.shipping)}`;
+                document.querySelector('[data-tax]').textContent = `₹${formatCurrency(data.tax)}`;
+                document.querySelector('[data-total]').textContent = `₹${formatCurrency(data.total)}`;
+            } else {
+                showToast(data.error);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('An error occurred while updating the cart');
+        }
+    }
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    async function removeFromCart(productId) {
+        if (confirm('Are you sure you want to remove this item from your cart?')) {
+            try {
+                const response = await fetch(`/remove_from_cart/${productId}`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    location.reload(); // We'll still reload for removal since it changes the cart structure
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred while removing the item');
+            }
+        }
+    }
+
+    function proceedToCheckout() {
+        window.location.href = "/checkout";
+    }
+    </script>
+  </body>
+</html>
