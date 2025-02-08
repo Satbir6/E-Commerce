@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden dark:bg-gray-800">
+        <div class="md:flex">
+            <!-- Product Image -->
+            <div class="md:w-1/2">
+                <div class="relative aspect-square">
+                    {% if product.image %}
+                    <img src="{{ url_for('static', filename='dist/product_images/' + product.image) }}" 
+                         alt="{{ product.name }}" 
+                         class="absolute inset-0 w-full h-full object-contain bg-white">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/placeholder.png') }}" 
+                         alt="No image" 
+                         class="absolute inset-0 w-full h-full object-contain bg-white">
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Product Details -->
+            <div class="md:w-1/2 p-8">
+                <h1 class="text-3xl font-bold mb-4 dark:text-white">{{ product.name }}</h1>
+                
+                <div class="flex items-center mb-4">
+                    <div class="flex items-center">
+                        {% for _ in range(5) %}
+                            {% if loop.index <= product.rating|round(0, 'floor') %}
+                                <svg class="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                </svg>
+                            {% else %}
+                                <svg class="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                </svg>
+                            {% endif %}
+                        {% endfor %}
+                        <span class="ml-2 text-gray-600 dark:text-gray-400">{{ "%.1f"|format(product.rating) }} rating</span>
+                    </div>
+                </div>
+                
+                <div class="text-3xl font-bold text-primary-600 mb-6">
+                    ₹{{ "%.2f"|format(product.price) }}
+                </div>
+                
+                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                    {{ product.description }}
+                </p>
+                
+                <div class="mb-6">
+                    <span class="text-gray-600 dark:text-gray-400">
+                        {% if product.stock > 0 %}
+                            In Stock ({{ product.stock }} available)
+                        {% else %}
+                            Out of Stock
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <button onclick="addToCart({{ product.id }})"
+                        {% if product.stock == 0 %}disabled{% endif %}
+                        class="w-full bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+                    {% if product.stock > 0 %}
+                        Add to Cart
+                    {% else %}
+                        Out of Stock
+                    {% endif %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function addToCart(productId) {
+    fetch(`/add_to_cart/${productId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            // Show success message
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-500';
+            toast.textContent = 'Added to cart successfully!';
+            document.body.appendChild(toast);
+            
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        } else {
+            alert('Error adding to cart. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error adding to cart. Please try again.');
+    });
+}
+</script>
+{% endblock %} 

@@ -1,39 +1,52 @@
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-    {% for product in products.items %}
-    <div class="bg-white rounded-lg shadow-md overflow-hidden dark:bg-gray-800 transition-transform hover:scale-105">
-        <div class="relative aspect-[4/3] w-full">
-            {% if product.image %}
-            <img src="{{ url_for('static', filename='dist/product_images/' + product.image) }}" 
-                 alt="{{ product.name }}" 
-                 class="absolute inset-0 w-full h-full object-contain bg-white">
-            {% else %}
-            <img src="{{ url_for('static', filename='images/placeholder.png') }}" 
-                 alt="No image" 
-                 class="absolute inset-0 w-full h-full object-contain bg-white">
-            {% endif %}
-        </div>
-        <div class="p-4">
-            <h2 class="text-lg font-bold dark:text-white">{{ product.name }}</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{{ product.description }}</p>
-            <div class="mt-4 flex justify-between items-center">
-                <span class="text-lg font-bold text-primary-600">₹{{ "%.2f"|format(product.price) }}</span>
-                <div class="flex items-center">
-                    <span class="text-yellow-400">★</span>
-                    <span class="ml-1 text-sm text-gray-600 dark:text-gray-400">{{ "%.1f"|format(product.rating) }}</span>
+<div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {% if products.items %}
+        {% for product in products.items %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden dark:bg-gray-800 transition-transform hover:scale-105">
+            <a href="{{ url_for('product_page', product_id=product.id) }}" class="block">
+                <div class="relative aspect-[4/3] w-full">
+                    {% if product.image %}
+                    <img src="{{ url_for('static', filename='dist/product_images/' + product.image) }}" 
+                         alt="{{ product.name }}" 
+                         class="absolute inset-0 w-full h-full object-contain bg-white">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/placeholder.png') }}" 
+                         alt="No image" 
+                         class="absolute inset-0 w-full h-full object-contain bg-white">
+                    {% endif %}
                 </div>
+                <div class="p-4">
+                    <h2 class="text-lg font-bold dark:text-white hover:text-primary-600">{{ product.name }}</h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{{ product.description }}</p>
+                    <div class="mt-4 flex justify-between items-center">
+                        <span class="text-lg font-bold text-primary-600">₹{{ "%.2f"|format(product.price) }}</span>
+                        <div class="flex items-center">
+                            <span class="text-yellow-400">★</span>
+                            <span class="ml-1 text-sm text-gray-600 dark:text-gray-400">{{ "%.1f"|format(product.rating) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            <div class="px-4 pb-4">
+                <button onclick="addToCart({{ product.id }})" 
+                        class="w-full bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors">
+                    Add to Cart
+                </button>
             </div>
         </div>
-    </div>
-    {% endfor %}
+        {% endfor %}
+    {% else %}
+        <div class="col-span-full text-center py-8" style="padding-bottom: 600px;">
+            <p class="text-gray-500 dark:text-gray-400">No products found matching your criteria.</p>
+        </div>
+    {% endif %}
 </div>
 
+{% if products.items %}
 <!-- Pagination -->
 <div class="mt-8 flex justify-center items-center space-x-2">
     {% if products.has_prev %}
-    <button class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-            hx-get="{{ url_for('home', page=products.prev_num) }}"
-            hx-target="#product-grid"
-            hx-swap="innerHTML transition:true">
+    <button class="pagination-button px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+            data-page="{{ products.prev_num }}">
         Previous
     </button>
     {% endif %}
@@ -43,11 +56,43 @@
     </span>
     
     {% if products.has_next %}
-    <button class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-            hx-get="{{ url_for('home', page=products.next_num) }}"
-            hx-target="#product-grid"
-            hx-swap="innerHTML transition:true">
+    <button class="pagination-button px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+            data-page="{{ products.next_num }}">
         Next
     </button>
     {% endif %}
-</div> 
+</div>
+{% endif %}
+
+<script>
+function addToCart(productId) {
+    fetch(`/add_to_cart/${productId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            // Show success message
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-500';
+            toast.textContent = 'Added to cart successfully!';
+            document.body.appendChild(toast);
+            
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        } else {
+            alert('Error adding to cart. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error adding to cart. Please try again.');
+    });
+}
+</script> 

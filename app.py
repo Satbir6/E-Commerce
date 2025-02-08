@@ -304,6 +304,43 @@ def logout():
     return redirect(url_for("home"))
 
 
+@app.route("/filter_products", methods=["POST"])
+def filter_products():
+    page = request.args.get('page', 1, type=int)
+    per_page = 12
+    
+    # Get filter parameters
+    category = request.form.get('category')
+    min_price = request.form.get('min_price', type=float)
+    max_price = request.form.get('max_price', type=float)
+    min_rating = request.form.get('rating', type=float)
+    
+    print(f"Filter params - category: {category}, min_price: {min_price}, max_price: {max_price}, rating: {min_rating}, page: {page}")
+    
+    # Start with base query
+    query = Product.query
+    
+    # Apply filters
+    if category and category != "all":
+        # Make case-insensitive comparison
+        query = query.filter(func.lower(Product.category) == func.lower(category))
+    if min_price is not None:
+        query = query.filter(Product.price >= min_price)
+    if max_price is not None:
+        query = query.filter(Product.price <= max_price)
+    if min_rating is not None:
+        query = query.filter(Product.rating >= min_rating)
+        
+    # Order and paginate
+    products = query.order_by(Product.created_at.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    
+    print(f"Found {products.total} products matching filters")
+    
+    return render_template("partials/product_grid.html", products=products)
+
+
 @app.route("/", methods=["GET"])
 def home():
     page = request.args.get('page', 1, type=int)
@@ -318,7 +355,12 @@ def home():
         # Return only the product grid for HTMX requests
         return render_template("partials/product_grid.html", products=products)
     
-    return render_template("home.html", products=products, user=current_user)
+    # Get min and max prices for the price slider
+    min_price = db.session.query(func.min(Product.price)).scalar() or 0
+    max_price = db.session.query(func.max(Product.price)).scalar() or 10000
+    
+    return render_template("home.html", products=products, user=current_user, 
+                         min_price=min_price, max_price=max_price)
 
 
 @app.route("/account", methods=["GET", "POST"])
@@ -586,6 +628,41 @@ def edit_product(product_id):
     flash("Product updated successfully", "success")
     return redirect(url_for("seller_dashboard"))
 
+
+@app.route("/product/<int:product_id>")
+def product_page(product_id):
+    product = Product.query.get_or_404(product_id)
+    
+    # Get min and max prices for the price slider
+    min_price = db.session.query(func.min(Product.price)).scalar() or 0
+    max_price = db.session.query(func.max(Product.price)).scalar() or 10000
+    
+    return render_template("product_page.html", 
+                         product=product, 
+                         user=current_user,
+                         min_price=min_price,
+                         max_price=max_price)
+
+@app.route("/add_to_cart/<int:product_id>", methods=["POST"])
+@login_required
+def add_to_cart(product_id):
+    product = Product.query.get_or_404(product_id)
+    
+    # Check if product already in cart
+    cart_item = CartItem.query.filter_by(user_id=current_user.id, product_id=product_id).first()
+    
+    if cart_item:
+        cart_item.quantity += 1
+    else:
+        cart_item = CartItem(user_id=current_user.id, product_id=product_id)
+        db.session.add(cart_item)
+    
+    try:
+        db.session.commit()
+        return jsonify({"message": "Product added to cart successfully"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 # Run the application
 if __name__ == "__main__":
