@@ -984,6 +984,30 @@ def orders():
                          min_price=min_price,
                          max_price=max_price)
 
+###############################################################################################################################################
+# Error Handlers
+###############################################################################################################################################
+
+@app.errorhandler(404)
+def page_not_found(e):
+    # Get min and max prices for the sidebar
+    min_price = db.session.query(func.min(Product.price)).scalar() or 0
+    max_price = db.session.query(func.max(Product.price)).scalar() or 10000
+    return render_template('errors/404.html', 
+                         user=current_user,
+                         min_price=min_price,
+                         max_price=max_price), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    # Get min and max prices for the sidebar
+    min_price = db.session.query(func.min(Product.price)).scalar() or 0
+    max_price = db.session.query(func.max(Product.price)).scalar() or 10000
+    return render_template('errors/500.html', 
+                         user=current_user,
+                         min_price=min_price,
+                         max_price=max_price), 500
+
 # Run the application
 if __name__ == "__main__":
     app.run(debug=True)
