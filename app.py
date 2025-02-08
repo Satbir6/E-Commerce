@@ -966,6 +966,24 @@ def place_order():
         print(f"Error placing order: {str(e)}")
         return jsonify({"error": "An error occurred while placing your order"}), 500
 
+@app.route("/orders")
+@login_required
+def orders():
+    # Get user's orders with items, ordered by most recent first
+    user_orders = Order.query.filter_by(user_id=current_user.id)\
+        .order_by(Order.created_at.desc())\
+        .all()
+    
+    # Get min and max prices for the sidebar
+    min_price = db.session.query(func.min(Product.price)).scalar() or 0
+    max_price = db.session.query(func.max(Product.price)).scalar() or 10000
+    
+    return render_template("user/orders.html", 
+                         orders=user_orders,
+                         user=current_user,
+                         min_price=min_price,
+                         max_price=max_price)
+
 # Run the application
 if __name__ == "__main__":
     app.run(debug=True)
