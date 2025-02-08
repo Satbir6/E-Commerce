@@ -6,4 +6,79 @@
         {% include 'partials/product_grid.html' %}
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to apply filters
+    function applyFilters() {
+        const activeCategory = document.querySelector('.category-link.active');
+        const category = activeCategory ? activeCategory.dataset.category : 'all';
+        const priceRange = document.getElementById('price-range').value;
+        const rating = document.querySelector('.rating-link.active')?.dataset.rating;
+
+        const data = {
+            category: category,
+            priceRange: priceRange,
+            rating: rating
+        };
+
+        fetch('/filter_products', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('product-grid').innerHTML = html;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Price range slider
+    const priceSlider = document.getElementById('price-range');
+    const minPriceDisplay = document.getElementById('min-price-display');
+    const maxPriceDisplay = document.getElementById('max-price-display');
+
+    if (priceSlider) {
+        // Set initial value to max
+        priceSlider.value = priceSlider.max;
+        maxPriceDisplay.textContent = priceSlider.max;
+
+        priceSlider.addEventListener('input', function() {
+            maxPriceDisplay.textContent = this.value;
+        });
+
+        priceSlider.addEventListener('change', function() {
+            applyFilters();
+        });
+    }
+
+    // Category filter
+    document.querySelectorAll('.category-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('.category-link').forEach(l => {
+                l.classList.remove('active', 'bg-gray-100');
+            });
+            this.classList.add('active', 'bg-gray-100');
+            applyFilters();
+        });
+    });
+
+    // Rating filter
+    document.querySelectorAll('.rating-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('.rating-link').forEach(l => {
+                l.classList.remove('active', 'bg-gray-100');
+            });
+            this.classList.add('active', 'bg-gray-100');
+            applyFilters();
+        });
+    });
+});
+</script>
 {% endblock %}

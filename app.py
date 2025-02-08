@@ -306,16 +306,13 @@ def logout():
 
 @app.route("/filter_products", methods=["GET", "POST"])
 def filter_products():
-    page = request.args.get('page', 1, type=int)
-    per_page = 12
-    
     try:
         # Handle both JSON and form data
         if request.is_json:
             data = request.get_json()
             category = data.get('category')
             price_range = data.get('priceRange')
-            min_rating = data.get('rating', type=float)
+            min_rating = float(data.get('rating')) if data.get('rating') else None
             
             # Convert price range to min and max
             if price_range:
@@ -326,9 +323,14 @@ def filter_products():
                 max_price = None
         else:
             category = request.form.get('category') or request.args.get('category')
-            min_price = request.form.get('min_price', type=float) or request.args.get('min_price', type=float)
-            max_price = request.form.get('max_price', type=float) or request.args.get('max_price', type=float)
-            min_rating = request.form.get('rating', type=float) or request.args.get('rating', type=float)
+            min_price = request.form.get('min_price') or request.args.get('min_price')
+            max_price = request.form.get('max_price') or request.args.get('max_price')
+            min_rating = request.form.get('rating') or request.args.get('rating')
+            
+            # Convert numeric values
+            min_price = float(min_price) if min_price else None
+            max_price = float(max_price) if max_price else None
+            min_rating = float(min_rating) if min_rating else None
         
         # Start with base query
         query = Product.query
@@ -344,12 +346,10 @@ def filter_products():
         if min_rating is not None:
             query = query.filter(Product.rating >= min_rating)
             
-        # Order and paginate
-        products = query.order_by(Product.created_at.desc()).paginate(
-            page=page, per_page=per_page, error_out=False
-        )
+        # Get all products with ordering
+        products = query.order_by(Product.created_at.desc()).all()
         
-        if request.headers.get('HX-Request'):
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return render_template("partials/product_grid.html", products=products)
         
         # Get min and max prices for the price slider
@@ -366,13 +366,8 @@ def filter_products():
 
 @app.route("/", methods=["GET"])
 def home():
-    page = request.args.get('page', 1, type=int)
-    per_page = 12
-    
-    # Get products with pagination
-    products = Product.query.order_by(Product.created_at.desc()).paginate(
-        page=page, per_page=per_page, error_out=False
-    )
+    # Get all products with ordering
+    products = Product.query.order_by(Product.created_at.desc()).all()
     
     if request.headers.get('HX-Request'):
         # Return only the product grid for HTMX requests

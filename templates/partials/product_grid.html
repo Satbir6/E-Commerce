@@ -1,6 +1,6 @@
 <div id="product-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-    {% if products.items %}
-        {% for product in products.items %}
+    {% if products %}
+        {% for product in products %}
         <div class="bg-white rounded-lg shadow-md overflow-hidden dark:bg-gray-800 transition-transform hover:scale-105">
             <a href="{{ url_for('product_page', product_id=product.id) }}" class="block">
                 <div class="relative aspect-[4/3] w-full">
@@ -40,29 +40,6 @@
         </div>
     {% endif %}
 </div>
-
-{% if products.items %}
-<!-- Pagination -->
-<div class="mt-8 flex justify-center items-center space-x-2">
-    {% if products.has_prev %}
-    <button class="pagination-button px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-            data-page="{{ products.prev_num }}">
-        Previous
-    </button>
-    {% endif %}
-    
-    <span class="px-4 py-2 text-gray-700 dark:text-gray-300">
-        Page {{ products.page }} of {{ products.pages }}
-    </span>
-    
-    {% if products.has_next %}
-    <button class="pagination-button px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-            data-page="{{ products.next_num }}">
-        Next
-    </button>
-    {% endif %}
-</div>
-{% endif %}
 
 <script>
 function addToCart(productId) {
