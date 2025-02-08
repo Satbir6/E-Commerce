@@ -1,17 +1,32 @@
+"""
+E-Commerce Web Application
+A Flask-based e-commerce platform with user authentication, product management,
+shopping cart functionality, and seller dashboard.
+
+Author: Satbir
+Version: 1.0.0
+"""
+
+# Standard library imports
+import os
+import time
+import uuid
 from datetime import datetime, timedelta
 from tempfile import NamedTemporaryFile
-import time
-from sqlalchemy.sql import case
+from functools import wraps
+
+# Third-party imports
+import pandas as pd
 from flask import (
-    Flask,
-    render_template,
-    request,
-    redirect,
+    Flask, 
+    render_template, 
+    request, 
+    redirect, 
     url_for,
-    flash,
-    jsonify,
-    session,
-    send_file,
+    flash, 
+    jsonify, 
+    session, 
+    send_file
 )
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import (
@@ -20,20 +35,15 @@ from flask_login import (
     login_user,
     login_required,
     logout_user,
-    current_user,
+    current_user
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from functools import wraps
-import pandas as pd
-import os
-import requests
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, case
 from pytz import timezone
-import uuid
 
-
+# Logging setup
 import logging
 from logging.handlers import RotatingFileHandler
 
@@ -189,9 +199,21 @@ def slice_filter(iterable, limit):
 # Routes
 ###############################################################################################################################################
 
+###############################################################################
+# === Authentication Routes ===
+###############################################################################
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    """Handle user login.
+    
+    GET: Display login form
+    POST: Authenticate user credentials and create session
+    
+    Returns:
+        GET: Login page template
+        POST: Redirect to home page on success, back to login with error on failure
+    """
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
@@ -201,32 +223,36 @@ def login():
             flash("Please fill in all fields.", "error")
             return redirect(url_for("login"))
 
-        # Check if user exists
+        # Check if user exists and verify credentials
         user = UserDatabase.query.filter_by(email=email).first()
         if not user:
             flash("Email not registered.", "error")
             return redirect(url_for("login"))
 
-        # Check if user is banned
         if user.is_banned:
             flash("Your account has been banned. Please contact support.", "error")
             return redirect(url_for("login"))
 
-        # Verify password
         if not check_password_hash(user.password, password):
             flash("Incorrect password.", "error")
             return redirect(url_for("login"))
 
-        # Log the user in
         login_user(user)
-        # flash("Login successful!", "success")
         return redirect(url_for("home"))
 
     return render_template("login.html")
 
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    """Handle new user registration.
+    
+    GET: Display registration form
+    POST: Create new user account
+    
+    Returns:
+        GET: Registration page template
+        POST: Redirect to home page on success, back to register with error on failure
+    """
     if request.method == "POST":
         # Get form data
         first_name = request.form.get("first_name")
@@ -299,74 +325,25 @@ def register():
 
 @app.route("/logout")
 def logout():
+    """Log out current user and clear session."""
     logout_user()
     # flash("You have been logged out.", "is-success")
     return redirect(url_for("home"))
 
-
-@app.route("/filter_products", methods=["GET", "POST"])
-def filter_products():
-    try:
-        # Handle both JSON and form data
-        if request.is_json:
-            data = request.get_json()
-            categories = data.get('categories', [])
-            price_range = data.get('priceRange')
-            min_rating = float(data.get('rating')) if data.get('rating') else None
-            
-            # Convert price range to min and max
-            if price_range:
-                max_price = float(price_range)
-                min_price = 0
-            else:
-                min_price = None
-                max_price = None
-        else:
-            categories = request.form.getlist('categories[]') or request.args.getlist('categories[]')
-            min_price = request.form.get('min_price') or request.args.get('min_price')
-            max_price = request.form.get('max_price') or request.args.get('max_price')
-            min_rating = request.form.get('rating') or request.args.get('rating')
-            
-            # Convert numeric values
-            min_price = float(min_price) if min_price else None
-            max_price = float(max_price) if max_price else None
-            min_rating = float(min_rating) if min_rating else None
-        
-        # Start with base query
-        query = Product.query
-        
-        # Apply category filter if categories are selected
-        if categories:
-            # Use OR condition for multiple categories
-            query = query.filter(Product.category.in_(categories))
-            
-        if min_price is not None:
-            query = query.filter(Product.price >= min_price)
-        if max_price is not None:
-            query = query.filter(Product.price <= max_price)
-        if min_rating is not None:
-            query = query.filter(Product.rating >= min_rating)
-            
-        # Get all products with ordering
-        products = query.order_by(Product.created_at.desc()).all()
-        
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return render_template("partials/product_grid.html", products=products)
-        
-        # Get min and max prices for the price slider
-        min_price = db.session.query(func.min(Product.price)).scalar() or 0
-        max_price = db.session.query(func.max(Product.price)).scalar() or 10000
-        
-        return render_template("home.html", products=products, 
-                             min_price=min_price, max_price=max_price)
-                             
-    except Exception as e:
-        print(f"Error in filter_products: {str(e)}")
-        return jsonify({"error": str(e)}), 500
-
+###############################################################################
+# === Public Routes ===
+###############################################################################
 
 @app.route("/", methods=["GET"])
 def home():
+    """Display homepage with product listings.
+    
+    Returns:
+        Homepage template with:
+        - List of all products
+        - Price range filters
+        - Category filters
+    """
     # Get all products with ordering
     products = Product.query.order_by(Product.created_at.desc()).all()
     
@@ -381,11 +358,76 @@ def home():
     return render_template("home.html", products=products, user=current_user, 
                          min_price=min_price, max_price=max_price)
 
+@app.route("/product/<int:product_id>")
+def product_page(product_id):
+    """Display individual product details.
+    
+    Args:
+        product_id: ID of product to display
+        
+    Returns:
+        Product detail page with:
+        - Product information
+        - Reviews
+        - Add to cart/wishlist options
+        - Purchase status for current user
+    """
+    product = Product.query.get_or_404(product_id)
+    
+    # Get min and max prices for the price slider
+    min_price = db.session.query(func.min(Product.price)).scalar() or 0
+    max_price = db.session.query(func.max(Product.price)).scalar() or 10000
+    
+    # Get wishlist status
+    wishlist = []
+    if current_user.is_authenticated:
+        wishlist = [item.product_id for item in Wishlist.query.filter_by(user_id=current_user.id).all()]
+    
+    # Get reviews
+    reviews = Review.query.filter_by(product_id=product_id).order_by(Review.created_at.desc()).all()
+    
+    # Check if user has purchased the product
+    has_purchased = False
+    has_reviewed = False
+    if current_user.is_authenticated:
+        # Check if user has any completed orders containing this product
+        has_purchased = db.session.query(Order).join(OrderItem).filter(
+            Order.user_id == current_user.id,
+            OrderItem.product_id == product_id,
+            Order.status == "Completed"
+        ).first() is not None
+        
+        # Check if user has already reviewed
+        has_reviewed = Review.query.filter_by(
+            user_id=current_user.id,
+            product_id=product_id
+        ).first() is not None
+    
+    return render_template("product_page.html", 
+                         product=product, 
+                         user=current_user,
+                         min_price=min_price,
+                         max_price=max_price,
+                         wishlist=wishlist,
+                         reviews=reviews,
+                         has_purchased=has_purchased,
+                         has_reviewed=has_reviewed)
+
+###############################################################################
+# === User Routes ===
+###############################################################################
 
 @app.route("/account", methods=["GET", "POST"])
 @login_required
 def account():
-    """Account page to display and update user details."""
+    """Handle user account management.
+    
+    GET: Display account details and order history
+    POST: Update account information
+    
+    Returns:
+        Account page template with user details and orders
+    """
     if request.method == "POST":
         # Fetch updated details from the form
         first_name = request.form.get("first_name")
@@ -418,7 +460,6 @@ def account():
     print(f"User Orders: {current_user.orders}")
     return render_template("user/account.html", user=current_user)
 
-
 @app.route("/cancel_order/<int:order_id>", methods=["POST"])
 @login_required
 def cancel_order(order_id):
@@ -446,14 +487,81 @@ def cancel_order(order_id):
 
     return redirect(url_for("account"))
 
+@app.route("/cart")
+@login_required
+def cart():
+    """Display user's shopping cart.
+    
+    Returns:
+        Cart page template with:
+        - Cart items
+        - Order summary
+        - Checkout options
+    """
+    cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
+    
+    # Calculate order summary
+    subtotal = sum(item.quantity * item.product.price for item in cart_items)
+    shipping = subtotal * 0.015  # 1.5% shipping fee
+    tax = subtotal * 0.18  # 18% tax
+    total = subtotal + shipping + tax
+    
+    # Get min and max prices for the sidebar
+    min_price = db.session.query(func.min(Product.price)).scalar() or 0
+    max_price = db.session.query(func.max(Product.price)).scalar() or 10000
+    
+    return render_template("cart.html", 
+                         cart_items=cart_items,
+                         subtotal=subtotal,
+                         shipping=shipping,
+                         tax=tax,
+                         total=total,
+                         user=current_user,
+                         min_price=min_price,
+                         max_price=max_price)
 
-###############################################################################################################################################
-# Seller Routes
-###############################################################################################################################################
+@app.route("/wishlist")
+@login_required
+def wishlist():
+    """Display user's wishlist items.
+    
+    Returns:
+        Wishlist page template with:
+        - Wishlist items
+        - Add to cart options
+        - Remove from wishlist options
+    """
+    # Get user's wishlist items with product details
+    wishlist_items = Wishlist.query.filter_by(user_id=current_user.id)\
+        .join(Product, Wishlist.product_id == Product.id)\
+        .add_entity(Product)\
+        .all()
+    
+    # Format wishlist items for template
+    formatted_items = [{"id": item[0].id, "product": item[1]} for item in wishlist_items]
+    
+    return render_template("user/wishlist.html", 
+                         wishlist_items=formatted_items,
+                         user=current_user)
+
+###############################################################################
+# === Seller Routes ===
+###############################################################################
 
 @app.route("/seller_dashboard")
 @login_required
 def seller_dashboard():
+    """Display seller dashboard with product and order management.
+    
+    Returns:
+        Dashboard template with:
+        - Product listings
+        - Order management
+        - Sales analytics
+        - Low stock alerts
+        
+    Requires seller privileges.
+    """
     if not current_user.is_seller:
         flash("You don't have permission to access the seller dashboard.", "error")
         return redirect(url_for("home"))
@@ -647,50 +755,6 @@ def edit_product(product_id):
     flash("Product updated successfully", "success")
     return redirect(url_for("seller_dashboard"))
 
-
-@app.route("/product/<int:product_id>")
-def product_page(product_id):
-    product = Product.query.get_or_404(product_id)
-    
-    # Get min and max prices for the price slider
-    min_price = db.session.query(func.min(Product.price)).scalar() or 0
-    max_price = db.session.query(func.max(Product.price)).scalar() or 10000
-    
-    # Get wishlist status
-    wishlist = []
-    if current_user.is_authenticated:
-        wishlist = [item.product_id for item in Wishlist.query.filter_by(user_id=current_user.id).all()]
-    
-    # Get reviews
-    reviews = Review.query.filter_by(product_id=product_id).order_by(Review.created_at.desc()).all()
-    
-    # Check if user has purchased the product
-    has_purchased = False
-    has_reviewed = False
-    if current_user.is_authenticated:
-        # Check if user has any completed orders containing this product
-        has_purchased = db.session.query(Order).join(OrderItem).filter(
-            Order.user_id == current_user.id,
-            OrderItem.product_id == product_id,
-            Order.status == "Completed"
-        ).first() is not None
-        
-        # Check if user has already reviewed
-        has_reviewed = Review.query.filter_by(
-            user_id=current_user.id,
-            product_id=product_id
-        ).first() is not None
-    
-    return render_template("product_page.html", 
-                         product=product, 
-                         user=current_user,
-                         min_price=min_price,
-                         max_price=max_price,
-                         wishlist=wishlist,
-                         reviews=reviews,
-                         has_purchased=has_purchased,
-                         has_reviewed=has_reviewed)
-
 @app.route("/add_to_cart/<int:product_id>", methods=["POST"])
 @login_required
 def add_to_cart(product_id):
@@ -801,31 +865,6 @@ def inject_cart_data():
         cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
         cart_count = sum(item.quantity for item in cart_items)
     return dict(cart_items=cart_items, cart_count=cart_count)
-
-@app.route("/cart")
-@login_required
-def cart():
-    cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
-    
-    # Calculate order summary
-    subtotal = sum(item.quantity * item.product.price for item in cart_items)
-    shipping = subtotal * 0.015  # 1.5% shipping fee
-    tax = subtotal * 0.18  # 18% tax
-    total = subtotal + shipping + tax
-    
-    # Get min and max prices for the sidebar
-    min_price = db.session.query(func.min(Product.price)).scalar() or 0
-    max_price = db.session.query(func.max(Product.price)).scalar() or 10000
-    
-    return render_template("cart.html", 
-                         cart_items=cart_items,
-                         subtotal=subtotal,
-                         shipping=shipping,
-                         tax=tax,
-                         total=total,
-                         user=current_user,
-                         min_price=min_price,
-                         max_price=max_price)
 
 @app.route("/update_cart/<int:product_id>", methods=["POST"])
 @login_required
@@ -985,12 +1024,122 @@ def orders():
                          max_price=max_price)
 
 ###############################################################################################################################################
-# Error Handlers
+# === API Routes ===
 ###############################################################################################################################################
+
+@app.route("/filter_products", methods=["GET", "POST"])
+def filter_products():
+    """Filter products based on categories, price range, and rating.
+    
+    Accepts both JSON and form data for filtering criteria.
+    
+    Returns:
+        Filtered product grid partial template for AJAX requests
+        Full page template for regular requests
+        
+    Error Codes:
+        500: Server error during filtering
+    """
+    try:
+        # Handle both JSON and form data
+        if request.is_json:
+            data = request.get_json()
+            categories = data.get('categories', [])
+            price_range = data.get('priceRange')
+            min_rating = float(data.get('rating')) if data.get('rating') else None
+            
+            # Convert price range to min and max
+            if price_range:
+                max_price = float(price_range)
+                min_price = 0
+            else:
+                min_price = None
+                max_price = None
+        else:
+            categories = request.form.getlist('categories[]') or request.args.getlist('categories[]')
+            min_price = request.form.get('min_price') or request.args.get('min_price')
+            max_price = request.form.get('max_price') or request.args.get('max_price')
+            min_rating = request.form.get('rating') or request.args.get('rating')
+            
+            # Convert numeric values
+            min_price = float(min_price) if min_price else None
+            max_price = float(max_price) if max_price else None
+            min_rating = float(min_rating) if min_rating else None
+        
+        # Start with base query
+        query = Product.query
+        
+        # Apply category filter if categories are selected
+        if categories:
+            # Use OR condition for multiple categories
+            query = query.filter(Product.category.in_(categories))
+            
+        if min_price is not None:
+            query = query.filter(Product.price >= min_price)
+        if max_price is not None:
+            query = query.filter(Product.price <= max_price)
+        if min_rating is not None:
+            query = query.filter(Product.rating >= min_rating)
+            
+        # Get all products with ordering
+        products = query.order_by(Product.created_at.desc()).all()
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return render_template("partials/product_grid.html", products=products)
+        
+        # Get min and max prices for the price slider
+        min_price = db.session.query(func.min(Product.price)).scalar() or 0
+        max_price = db.session.query(func.max(Product.price)).scalar() or 10000
+        
+        return render_template("home.html", products=products, 
+                             min_price=min_price, max_price=max_price)
+                             
+    except Exception as e:
+        print(f"Error in filter_products: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+###############################################################################
+# === Helper Functions ===
+###############################################################################
+
+@app.context_processor
+def inject_cart_data():
+    """Inject cart data into all templates.
+    
+    Returns:
+        Dict containing cart items and count
+    """
+    cart_items = []
+    cart_count = 0
+    if current_user.is_authenticated:
+        cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
+        cart_count = sum(item.quantity for item in cart_items)
+    return dict(cart_items=cart_items, cart_count=cart_count)
+
+@app.template_filter("slice")
+def slice_filter(iterable, limit):
+    """Custom template filter to slice iterables.
+    
+    Args:
+        iterable: Iterable to slice
+        limit: Maximum number of items to return
+        
+    Returns:
+        Sliced list
+    """
+    return list(iterable)[:limit]
+
+###############################################################################
+# === Error Handlers ===
+###############################################################################
 
 @app.errorhandler(404)
 def page_not_found(e):
-    # Get min and max prices for the sidebar
+    """Handle 404 Not Found errors.
+    
+    Returns:
+        404 error page with sidebar data
+    """
     min_price = db.session.query(func.min(Product.price)).scalar() or 0
     max_price = db.session.query(func.max(Product.price)).scalar() or 10000
     return render_template('errors/404.html', 
@@ -1000,7 +1149,11 @@ def page_not_found(e):
 
 @app.errorhandler(500)
 def internal_server_error(e):
-    # Get min and max prices for the sidebar
+    """Handle 500 Internal Server errors.
+    
+    Returns:
+        500 error page with sidebar data
+    """
     min_price = db.session.query(func.min(Product.price)).scalar() or 0
     max_price = db.session.query(func.max(Product.price)).scalar() or 10000
     return render_template('errors/500.html', 
