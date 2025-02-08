@@ -1,6 +1,6 @@
 {% extends './layout.html' %}
 {% block content %}
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-4 pb-8 pt-4">
     <!-- Product Grid -->
     <div id="product-grid" hx-get="{{ url_for('home') }}" hx-trigger="load" hx-swap="innerHTML">
         {% include 'partials/product_grid.html' %}
