@@ -33,9 +33,11 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 container" >
     {% include 'components/navbar.html' %}
-    {% include 'components/sidebar.html' %}
+    {% if not request.endpoint in ['product_page', 'orders', 'offers', 'recently_viewed'] %}
+        {% include 'components/sidebar.html' %}
+    {% endif %}
     
-    <div class="p-4 md:ml-72">
+    <div class="p-4 {% if not request.endpoint in ['product_page', 'orders', 'offers', 'recently_viewed'] %}md:ml-72{% endif %}">
         <div class="mt-14">
             {% block content %}{% endblock %}
         </div>

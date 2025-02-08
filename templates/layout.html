@@ -22,12 +22,14 @@
     <div class="antialiased bg-gray-50 dark:bg-gray-900">
       <!-- Navbar -->
       {% include 'components/navbar.html' %}
-      <!-- Sidebar - Hide on product page and orders page -->
-      {% if not request.endpoint in ['product_page', 'orders'] %}
+      <!-- Debug: Current endpoint is: {{ request.endpoint }} -->
+      
+      <!-- Sidebar - Hide on product page, orders page, offers page, and recently viewed page -->
+      {% if not request.endpoint in ['product_page', 'orders', 'offers', 'recently_viewed'] %}
         {% include 'components/sidebar.html' %}
       {% endif %}
       <!-- Main Content - Adjust margin based on sidebar visibility -->
-      <main class="p-4 {% if not request.endpoint in ['product_page', 'orders'] %}md:ml-72{% endif %} h-auto pt-20">
+      <main class="p-4 {% if not request.endpoint in ['product_page', 'orders', 'offers', 'recently_viewed'] %}md:ml-72{% endif %} h-auto pt-20">
         {% if request.endpoint == 'product_page' %}
         <nav class="flex mb-4" aria-label="Breadcrumb">
           <ol class="inline-flex items-center space-x-1 md:space-x-2">
