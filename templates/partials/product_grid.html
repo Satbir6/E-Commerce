@@ -1,15 +1,17 @@
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
     {% for product in products.items %}
     <div class="bg-white rounded-lg shadow-md overflow-hidden dark:bg-gray-800 transition-transform hover:scale-105">
-        {% if product.image %}
-        <img src="{{ url_for('static', filename='dist/product_images/' + product.image) }}" 
-             alt="{{ product.name }}" 
-             class="w-full h-48 object-cover">
-        {% else %}
-        <img src="{{ url_for('static', filename='images/placeholder.png') }}" 
-             alt="No image" 
-             class="w-full h-48 object-cover">
-        {% endif %}
+        <div class="relative aspect-[4/3] w-full">
+            {% if product.image %}
+            <img src="{{ url_for('static', filename='dist/product_images/' + product.image) }}" 
+                 alt="{{ product.name }}" 
+                 class="absolute inset-0 w-full h-full object-contain bg-white">
+            {% else %}
+            <img src="{{ url_for('static', filename='images/placeholder.png') }}" 
+                 alt="No image" 
+                 class="absolute inset-0 w-full h-full object-contain bg-white">
+            {% endif %}
+        </div>
         <div class="p-4">
             <h2 class="text-lg font-bold dark:text-white">{{ product.name }}</h2>
             <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{{ product.description }}</p>
