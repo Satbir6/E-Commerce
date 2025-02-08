@@ -1,20 +1,84 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-gray-900">
-    <div class="text-center">
-        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">{{ page_title }}</h1>
-        <div class="flex items-center justify-center mb-8">
-            <svg class="w-12 h-12 text-gray-400 dark:text-gray-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+<div class="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-6 ">
+    <div class="text-center max-w-lg">
+        <h1 class="text-5xl font-extrabold text-gray-900 dark:text-white mb-6 ">{{ page_title }}</h1>
+        
+        <p class="text-lg text-gray-600 dark:text-gray-900 mb-4 font-bold">Something amazing is on the way! Stay tuned.</p>
+        
+
+        <div id="countdown" class="flex justify-center space-x-6 text-gray-900 dark:text-white text-3xl font-bold my-6">
+            <div class="flex flex-col items-center">
+                <span id="days">00</span>
+                <span class="text-sm text-gray-500 dark:text-gray-400">Days</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <span id="hours">00</span>
+                <span class="text-sm text-gray-500 dark:text-gray-400">Hours</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <span id="minutes">00</span>
+                <span class="text-sm text-gray-500 dark:text-gray-400">Minutes</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <span id="seconds">00</span>
+                <span class="text-sm text-gray-500 dark:text-gray-400">Seconds</span>
+            </div>
         </div>
-        <p class="text-xl text-gray-600 dark:text-gray-400">Coming Soon...</p>
-        <p class="mt-4 text-gray-500 dark:text-gray-500">We're working hard to bring you something amazing!</p>
-        <a href="{{ url_for('home') }}" class="inline-block mt-8 px-6 py-3 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+        
+
+        
+        <a href="{{ url_for('home') }}" class="inline-block mt-8 px-6 py-3 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-offset-gray-900">
             Back to Home
         </a>
     </div>
 </div>
-{% endblock %} 
+
+<style>
+  .container {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    background-image: radial-gradient(black 2px, transparent 0);
+    background-size: 30px 30px;
+    background-position: -5px -5px;
+    animation: moveBackground 5s linear infinite;
+  }
+
+  @keyframes moveBackground {
+    0% { background-position: -5px -5px; }
+    100% { background-position: 25px 25px; }
+  }
+</style>
+
+{% block scripts %}
+<script>
+    function countdown() {
+        const launchDate = new Date("2025-06-01T00:00:00").getTime();
+        const timer = setInterval(() => {
+            const now = new Date().getTime();
+            const timeLeft = launchDate - now;
+            
+            if (timeLeft < 0) {
+                clearInterval(timer);
+                document.getElementById("countdown").innerHTML = "We're Live!";
+                return;
+            }
+            
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            
+            document.getElementById("days").textContent = days;
+            document.getElementById("hours").textContent = hours;
+            document.getElementById("minutes").textContent = minutes;
+            document.getElementById("seconds").textContent = seconds;
+        }, 1000);
+    }
+    
+    countdown();
+</script>
+{% endblock %}
+{% endblock %}

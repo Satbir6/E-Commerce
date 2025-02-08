@@ -898,6 +898,74 @@ def recently_viewed():
                          user=current_user,
                          max_price=max_price)
 
+@app.route("/place_order", methods=["POST"])
+@login_required
+def place_order():
+    try:
+        # Get cart items
+        cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
+        if not cart_items:
+            return jsonify({"error": "Cart is empty"}), 400
+
+        # Calculate totals
+        subtotal = sum(item.quantity * item.product.price for item in cart_items)
+        shipping = subtotal * 0.015
+        tax = subtotal * 0.18
+        total = subtotal + shipping + tax
+
+        # Create new order
+        order = Order(
+            user_id=current_user.id,
+            total_price=total,
+            status="Pending"
+        )
+        db.session.add(order)
+        db.session.flush()  # Get order ID before committing
+
+        # Create order items and update product stock
+        for cart_item in cart_items:
+            product = cart_item.product
+            if product.stock < cart_item.quantity:
+                db.session.rollback()
+                return jsonify({
+                    "error": f"Not enough stock for {product.name}. Only {product.stock} available."
+                }), 400
+
+            # Create order item
+            order_item = OrderItem(
+                order_id=order.id,
+                product_id=cart_item.product_id,
+                quantity=cart_item.quantity,
+                price=product.price
+            )
+            db.session.add(order_item)
+
+            # Update product stock
+            product.stock -= cart_item.quantity
+
+            # Update product and supplier earnings
+            item_total = cart_item.quantity * product.price
+            product.earning += item_total
+            supplier = UserDatabase.query.get(product.supplier_id)
+            supplier.earning += item_total
+
+        # Clear cart
+        for item in cart_items:
+            db.session.delete(item)
+
+        db.session.commit()
+        return jsonify({
+            "message": "Order placed successfully",
+            "user_name": current_user.first_name + " " + current_user.last_name,
+            "address": current_user.address,
+            "phone": current_user.phone_number
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error placing order: {str(e)}")
+        return jsonify({"error": "An error occurred while placing your order"}), 500
+
 # Run the application
 if __name__ == "__main__":
     app.run(debug=True)
