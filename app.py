@@ -240,7 +240,7 @@ def login():
         login_user(user)
         return redirect(url_for("home"))
 
-    return render_template("login.html")
+    return render_template("auth/login.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -320,7 +320,7 @@ def register():
             flash("An error occurred during registration.", "error")
             return redirect(url_for("register"))
 
-    return render_template("register.html")
+    return render_template("auth/register.html")
 
 
 @app.route("/logout")
@@ -355,7 +355,7 @@ def home():
     min_price = db.session.query(func.min(Product.price)).scalar() or 0
     max_price = db.session.query(func.max(Product.price)).scalar() or 10000
     
-    return render_template("home.html", products=products, user=current_user, 
+    return render_template("shop/home.html", products=products, user=current_user, 
                          min_price=min_price, max_price=max_price)
 
 @app.route("/product/<int:product_id>")
@@ -403,7 +403,7 @@ def product_page(product_id):
             product_id=product_id
         ).first() is not None
     
-    return render_template("product_page.html", 
+    return render_template("shop/product_page.html", 
                          product=product, 
                          user=current_user,
                          min_price=min_price,
@@ -458,7 +458,7 @@ def account():
 
     # Sort orders by created_at in descending order
     print(f"User Orders: {current_user.orders}")
-    return render_template("user/account.html", user=current_user)
+    return render_template("users/account.html", user=current_user)
 
 @app.route("/cancel_order/<int:order_id>", methods=["POST"])
 @login_required
@@ -510,7 +510,7 @@ def cart():
     min_price = db.session.query(func.min(Product.price)).scalar() or 0
     max_price = db.session.query(func.max(Product.price)).scalar() or 10000
     
-    return render_template("cart.html", 
+    return render_template("shop/cart.html", 
                          cart_items=cart_items,
                          subtotal=subtotal,
                          shipping=shipping,
@@ -540,7 +540,7 @@ def wishlist():
     # Format wishlist items for template
     formatted_items = [{"id": item[0].id, "product": item[1]} for item in wishlist_items]
     
-    return render_template("user/wishlist.html", 
+    return render_template("users/wishlist.html", 
                          wishlist_items=formatted_items,
                          user=current_user)
 
@@ -596,7 +596,7 @@ def seller_dashboard():
         .all()
 
     return render_template(
-        "seller/dashboard.html",
+        "sellers/dashboard.html",
         user=current_user,
         products_pagination=products_pagination,
         products=products,  # Add this for the edit modals
@@ -919,7 +919,7 @@ def offers():
     min_price = db.session.query(func.min(Product.price)).scalar() or 0
     max_price = db.session.query(func.max(Product.price)).scalar() or 10000
     
-    return render_template("coming_soon.html", 
+    return render_template("shop/coming_soon.html", 
                          page_title="Offers & Deals",
                          min_price=min_price,
                          user=current_user,
@@ -931,7 +931,7 @@ def recently_viewed():
     min_price = db.session.query(func.min(Product.price)).scalar() or 0
     max_price = db.session.query(func.max(Product.price)).scalar() or 10000
     
-    return render_template("coming_soon.html", 
+    return render_template("shop/coming_soon.html", 
                          page_title="Recently Viewed",
                          min_price=min_price,
                          user=current_user,
@@ -1017,7 +1017,7 @@ def orders():
     min_price = db.session.query(func.min(Product.price)).scalar() or 0
     max_price = db.session.query(func.max(Product.price)).scalar() or 10000
     
-    return render_template("user/orders.html", 
+    return render_template("users/orders.html", 
                          orders=user_orders,
                          user=current_user,
                          min_price=min_price,
